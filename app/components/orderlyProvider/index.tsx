@@ -70,10 +70,8 @@ const OrderlyProvider = (props: { children: ReactNode }) => {
 	const [isClient, setIsClient] = useState(false);
 	
 	const privyAppId = import.meta.env.VITE_PRIVY_APP_ID;
-	const privyTermsOfUse = import.meta.env.VITE_PRIVY_TERMS_OF_USE;
-	const usePrivy = !!(privyAppId && privyTermsOfUse);
+	const usePrivy = !!privyAppId;
 
-	// Parse chain IDs from environment variables
 	const parseChainIds = (envVar: string | undefined): Array<{id: number}> | undefined => {
 		if (!envVar) return undefined;
 		return envVar.split(',')

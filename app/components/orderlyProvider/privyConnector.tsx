@@ -16,6 +16,8 @@ const PrivyConnector = ({ children, networkId }: {
   const termsOfUseUrl = import.meta.env.VITE_PRIVY_TERMS_OF_USE;
   const walletConnectProjectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID;
   const enableAbstractWallet = import.meta.env.VITE_ENABLE_ABSTRACT_WALLET === 'true';
+  const disableEVMWallets = import.meta.env.VITE_DISABLE_EVM_WALLETS === 'true';
+  const disableSolanaWallets = import.meta.env.VITE_DISABLE_SOLANA_WALLETS === 'true';
   const isBrowser = typeof window !== 'undefined';
 
   const connectors: CreateConnectorFn[] = [injected()];
@@ -38,10 +40,10 @@ const PrivyConnector = ({ children, networkId }: {
     <WalletConnectorPrivyProvider
       network={networkId === 'mainnet' ? Network.mainnet : Network.testnet}
       termsOfUse={termsOfUseUrl}
-      wagmiConfig={{
+      wagmiConfig={disableEVMWallets ? undefined : {
         connectors
       }}
-      solanaConfig={{
+      solanaConfig={disableSolanaWallets ? undefined : {
         wallets: [
           new PhantomWalletAdapter(),
           new SolflareWalletAdapter(),
