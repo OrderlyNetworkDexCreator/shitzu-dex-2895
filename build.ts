@@ -11,6 +11,7 @@ const STATIC_ROUTES = [
   "/portfolio/fee",
   "/portfolio/api-key",
   "/portfolio/setting",
+  "/leaderboard",
 ];
 
 interface SymbolInfo {
