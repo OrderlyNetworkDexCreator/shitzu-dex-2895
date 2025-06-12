@@ -11,6 +11,14 @@ interface MainNavItem {
   target?: string;
 }
 
+interface ColorConfigInterface {
+  upColor?: string;
+  downColor?: string;
+  pnlUpColor?: string;
+  pnlDownColor?: string;
+  chartBG?: string;
+}
+
 export type OrderlyConfig = {
   orderlyAppProvider: {
     appIcons: AppLogos;
@@ -173,6 +181,22 @@ const getBottomNavMenus = () => {
     .filter(menu => menu.activeIcon && menu.inactiveIcon);
 };
 
+const getColorConfig = (): ColorConfigInterface | undefined => {
+  const customColorConfigEnv = import.meta.env.VITE_TRADING_VIEW_COLOR_CONFIG;
+  
+  if (!customColorConfigEnv || typeof customColorConfigEnv !== 'string' || customColorConfigEnv.trim() === '') {
+    return undefined;
+  }
+  
+  try {
+    const customColorConfig = JSON.parse(customColorConfigEnv);
+    return customColorConfig;
+  } catch (e) {
+    console.warn("Error parsing VITE_TRADING_VIEW_COLOR_CONFIG:", e);
+    return undefined;
+  }
+};
+
 const config: OrderlyConfig = {
   scaffold: {
     mainNavProps: {
@@ -230,6 +254,7 @@ const config: OrderlyConfig = {
       scriptSRC: withBasePath("/tradingview/charting_library/charting_library.js"),
       library_path: withBasePath("/tradingview/charting_library/"),
       customCssUrl: withBasePath("/tradingview/chart.css"),
+      colorConfig: getColorConfig(),
     },
     sharePnLConfig: {
       backgroundImages: getPnLBackgroundImages(),
@@ -240,8 +265,8 @@ const config: OrderlyConfig = {
       brandColor: "rgba(255, 255, 255, 0.98)",
 
       // ref
-      refLink: "https://orderly.network",
-      refSlogan: "Orderly referral",
+      refLink: typeof window !== 'undefined' ? window.location.origin : undefined,
+      refSlogan: import.meta.env.VITE_ORDERLY_BROKER_NAME || "Orderly Network",
     },
   },
 };
