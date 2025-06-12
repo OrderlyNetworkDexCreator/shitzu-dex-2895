@@ -1,8 +1,9 @@
 import { TradingPageProps } from "@orderly.network/trading";
-import { FooterProps, MainNavWidgetProps } from "@orderly.network/ui-scaffold";
+import { BottomNavProps, FooterProps, MainNavWidgetProps } from "@orderly.network/ui-scaffold";
 import { AppLogos } from "@orderly.network/react-app";
 import { OrderlyActiveIcon, OrderlyIcon } from "../components/icons/orderly";
 import { withBasePath } from "./base-path";
+import { PortfolioActiveIcon, PortfolioInactiveIcon, TradingActiveIcon, TradingInactiveIcon, LeaderboardActiveIcon, LeaderboardInactiveIcon } from "@orderly.network/ui";
 
 interface MainNavItem {
   name: string;
@@ -17,6 +18,7 @@ export type OrderlyConfig = {
   scaffold: {
     mainNavProps: MainNavWidgetProps;
     footerProps: FooterProps;
+    bottomNavProps: BottomNavProps;
   };
   tradingPage: {
     tradingViewConfig: TradingPageProps["tradingViewConfig"];
@@ -140,6 +142,37 @@ const getPnLBackgroundImages = (): string[] => {
   ];
 };
 
+const getBottomNavIcon = (menuName: string) => {
+  switch (menuName) {
+    case "Trading":
+      return { activeIcon: <TradingActiveIcon />, inactiveIcon: <TradingInactiveIcon /> };
+    case "Portfolio":
+      return { activeIcon: <PortfolioActiveIcon />, inactiveIcon: <PortfolioInactiveIcon /> };
+    case "Leaderboard":
+      return { activeIcon: <LeaderboardActiveIcon />, inactiveIcon: <LeaderboardInactiveIcon /> };
+    default:
+      throw new Error(`Unsupported menu name: ${menuName}`);
+  }
+};
+
+const getBottomNavMenus = () => {
+  const enabledMenus = getEnabledMenus();
+  
+  const supportedBottomNavMenus = ["Trading", "Portfolio", "Leaderboard"];
+  
+  return enabledMenus
+    .filter(menu => supportedBottomNavMenus.includes(menu.name))
+    .map(menu => {
+      const icons = getBottomNavIcon(menu.name);
+      return {
+        name: menu.name,
+        href: menu.href,
+        ...icons
+      };
+    })
+    .filter(menu => menu.activeIcon && menu.inactiveIcon);
+};
+
 const config: OrderlyConfig = {
   scaffold: {
     mainNavProps: {
@@ -168,6 +201,9 @@ const config: OrderlyConfig = {
           },
         ],
       },
+    },
+    bottomNavProps: {
+      mainMenus: getBottomNavMenus(),
     },
     footerProps: {
       telegramUrl: import.meta.env.VITE_TELEGRAM_URL || undefined,
