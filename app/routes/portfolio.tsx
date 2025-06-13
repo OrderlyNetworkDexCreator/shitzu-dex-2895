@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { Outlet, useLocation } from "@remix-run/react";
 import { PortfolioLayoutWidget } from "@orderly.network/portfolio";
-import config from "@/utils/config";
+import { useOrderlyConfig } from "@/utils/config";
 import { useNav } from "@/hooks/useNav";
 
 export default function PortfolioLayout() {
@@ -9,6 +9,7 @@ export default function PortfolioLayout() {
   const pathname = location.pathname;
 
   const { onRouteChange } = useNav();
+  const config = useOrderlyConfig();
 
   const currentPath = useMemo(() => {
     if (pathname.endsWith("/portfolio")) return "/portfolio";

@@ -6,14 +6,15 @@ import { Box } from "@orderly.network/ui";
 import { PositionsModule } from "@orderly.network/portfolio";
 import { useTradingLocalStorage } from "@orderly.network/trading";
 import { updateSymbol } from "@/utils/storage";
-import config from "@/utils/config";
 import { generatePageTitle } from "@/utils/utils";
+import { useOrderlyConfig } from "@/utils/config";
 
 export const meta: MetaFunction = () => {
   return [{ title: generatePageTitle("Positions") }];
 };
 
 export default function PositionsPage() {
+  const config = useOrderlyConfig();
   const local = useTradingLocalStorage();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();

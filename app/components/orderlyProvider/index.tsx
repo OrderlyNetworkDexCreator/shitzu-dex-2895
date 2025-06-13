@@ -1,6 +1,6 @@
 import { ReactNode, useCallback, lazy, Suspense, useState, useEffect } from "react";
 import { OrderlyAppProvider } from "@orderly.network/react-app";
-import config from "@/utils/config";
+import { useOrderlyConfig } from "@/utils/config";
 import type { NetworkId } from "@orderly.network/types";
 import { LocaleProvider, Resources, defaultLanguages } from "@orderly.network/i18n";
 
@@ -111,6 +111,7 @@ const LoadingSpinner = () => (
 );
 
 const OrderlyProvider = (props: { children: ReactNode }) => {
+	const config = useOrderlyConfig();
 	const networkId = getNetworkId();
 	const [isClient, setIsClient] = useState(false);
 	

@@ -1,9 +1,10 @@
 import { Outlet } from "@remix-run/react";
+import { useOrderlyConfig } from "@/utils/config";
 import { Scaffold } from "@orderly.network/ui-scaffold";
-import config from "@/utils/config";
 import { useNav } from "@/hooks/useNav";
 
 export default function MarketsPage() {
+  const config = useOrderlyConfig();
   const { onRouteChange } = useNav();
 
   return (
