@@ -16,6 +16,7 @@
     "typecheck": "tsc"
   },
   "dependencies": {
+    "@orderly.network/i18n": "2.2.0",
     "@orderly.network/markets": "2.2.0",
     "@orderly.network/portfolio": "2.2.0",
     "@orderly.network/react-app": "2.2.0",
