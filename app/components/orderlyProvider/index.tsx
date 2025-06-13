@@ -38,7 +38,7 @@ const LocaleProviderWithLanguages = lazy(async () => {
 	const languagePromises = languageCodes.map(async (code: string) => {
 		const trimmedCode = code.trim();
 		try {
-			const response = await fetch(`/locales/${trimmedCode}.json`);
+			const response = await fetch(`${import.meta.env.VITE_BASE_URL ?? ''}/locales/${trimmedCode}.json`);
 			if (!response.ok) {
 				throw new Error(`Failed to fetch ${trimmedCode}.json: ${response.status}`);
 			}
