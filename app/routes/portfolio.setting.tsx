@@ -1,9 +1,12 @@
 import { MetaFunction } from "@remix-run/node";
 import { SettingModule } from "@orderly.network/portfolio";
 import { generatePageTitle } from "@/utils/utils";
+import { getPageMeta } from "@/utils/seo";
 
 export const meta: MetaFunction = () => {
-  return [{ title: generatePageTitle("Settings") }];
+  const rootSeoTags = getPageMeta();
+  const pageSpecificTags = [{ title: generatePageTitle("Setting") }];
+  return [...rootSeoTags, ...pageSpecificTags];
 };
 
 export default function SettingsPage() {

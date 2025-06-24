@@ -1,9 +1,12 @@
 import { MetaFunction } from "@remix-run/node";
 import { APIManagerModule } from "@orderly.network/portfolio";
 import { generatePageTitle } from "@/utils/utils";
+import { getPageMeta } from "@/utils/seo";
 
 export const meta: MetaFunction = () => {
-  return [{ title: generatePageTitle("API keys") }];
+  const rootSeoTags = getPageMeta();
+  const pageSpecificTags = [{ title: generatePageTitle("API Key") }];
+  return [...rootSeoTags, ...pageSpecificTags];
 };
 
 export default function APIKeyPage() {

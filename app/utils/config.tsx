@@ -120,7 +120,6 @@ const getPnLBackgroundImages = (): string[] => {
     const customPnLCount = parseInt(import.meta.env.VITE_CUSTOM_PNL_POSTER_COUNT, 10);
     
     if (isNaN(customPnLCount) || customPnLCount < 1) {
-      console.warn("Invalid VITE_CUSTOM_PNL_POSTER_COUNT. Using default posters.");
       return [
         withBasePath("/pnl/poster_bg_1.png"),
         withBasePath("/pnl/poster_bg_2.png"),

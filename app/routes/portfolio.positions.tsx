@@ -8,9 +8,12 @@ import { useTradingLocalStorage } from "@orderly.network/trading";
 import { updateSymbol } from "@/utils/storage";
 import { generatePageTitle } from "@/utils/utils";
 import { useOrderlyConfig } from "@/utils/config";
+import { getPageMeta } from "@/utils/seo";
 
 export const meta: MetaFunction = () => {
-  return [{ title: generatePageTitle("Positions") }];
+  const rootSeoTags = getPageMeta();
+  const pageSpecificTags = [{ title: generatePageTitle("Positions") }];
+  return [...rootSeoTags, ...pageSpecificTags];
 };
 
 export default function PositionsPage() {

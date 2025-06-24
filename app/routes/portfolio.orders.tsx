@@ -2,9 +2,12 @@ import { MetaFunction } from "@remix-run/node";
 import { Box } from "@orderly.network/ui";
 import { OrdersModule } from "@orderly.network/portfolio";
 import { generatePageTitle } from "@/utils/utils";
+import { getPageMeta } from "@/utils/seo";
 
 export const meta: MetaFunction = () => {
-  return [{ title: generatePageTitle("Orders") }];
+  const rootSeoTags = getPageMeta();
+  const pageSpecificTags = [{ title: generatePageTitle("Orders") }];
+  return [...rootSeoTags, ...pageSpecificTags];
 };
 
 export default function OrdersPage() {

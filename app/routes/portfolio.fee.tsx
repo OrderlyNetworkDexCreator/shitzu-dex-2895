@@ -1,9 +1,12 @@
 import { MetaFunction } from "@remix-run/node";
 import { FeeTierModule } from "@orderly.network/portfolio";
 import { generatePageTitle } from "@/utils/utils";
+import { getPageMeta } from "@/utils/seo";
 
 export const meta: MetaFunction = () => {
-  return [{ title: generatePageTitle("Fee tier") }];
+  const rootSeoTags = getPageMeta();
+  const pageSpecificTags = [{ title: generatePageTitle("Fee") }];
+  return [...rootSeoTags, ...pageSpecificTags];
 };
 
 export default function FeeTierPage() {

@@ -6,9 +6,12 @@ import { TradingPage } from "@orderly.network/trading";
 import { updateSymbol } from "@/utils/storage";
 import { formatSymbol, generatePageTitle } from "@/utils/utils";
 import { useOrderlyConfig } from "@/utils/config";
+import { getPageMeta } from "@/utils/seo";
 
 export const meta: MetaFunction = ({ params }) => {
-  return [{ title: generatePageTitle(formatSymbol(params.symbol!)) }];
+  const rootSeoTags = getPageMeta();
+  const pageSpecificTags = [{ title: generatePageTitle(formatSymbol(params.symbol!)) }];
+  return [...rootSeoTags, ...pageSpecificTags];
 };
 
 export default function PerpPage() {

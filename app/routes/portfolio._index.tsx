@@ -1,9 +1,12 @@
 import { MetaFunction } from "@remix-run/node";
 import { OverviewModule } from "@orderly.network/portfolio";
 import { generatePageTitle } from "@/utils/utils";
+import { getPageMeta } from "@/utils/seo";
 
 export const meta: MetaFunction = () => {
-  return [{ title: generatePageTitle("Portfolio") }];
+  const rootSeoTags = getPageMeta();
+  const pageSpecificTags = [{ title: generatePageTitle("Portfolio") }];
+  return [...rootSeoTags, ...pageSpecificTags];
 };
 
 export default function PortfolioPage() {
