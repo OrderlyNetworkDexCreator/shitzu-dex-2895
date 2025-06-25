@@ -1,5 +1,3 @@
-import { withBasePath } from "./base-path";
-
 export interface SEOConfig {
   siteName?: string;
   siteDescription?: string;
@@ -127,7 +125,13 @@ export function getPageMeta(): (MetaTag | LinkTag)[] {
 
   const fullTitle = siteName;
   const fullUrl = siteUrl || "";
-  const metaImage = withBasePath("/logo.webp");
+
+  let metaImage;
+  if (siteUrl) {
+    const baseUrl = siteUrl.endsWith("/") ? siteUrl.slice(0, -1) : siteUrl;
+    metaImage = `${baseUrl}/logo.webp`;
+  }
+
   const metaKeywords = config.keywords;
 
   const tags: (MetaTag | LinkTag)[] = [];
@@ -161,6 +165,9 @@ export function getPageMeta(): (MetaTag | LinkTag)[] {
       { property: "og:type", content: "website" },
       { property: "og:url", content: fullUrl }
     );
+    if (metaImage) {
+      tags.push({ property: "og:image", content: metaImage });
+    }
 
     if (siteDescription) {
       tags.push({ property: "og:description", content: siteDescription });
@@ -169,13 +176,9 @@ export function getPageMeta(): (MetaTag | LinkTag)[] {
     if (config.locale) {
       tags.push({ property: "og:locale", content: config.locale });
     }
-
-    if (metaImage) {
-      tags.push({ property: "og:image", content: metaImage });
-    }
   }
 
-  if (config.twitterHandle || metaImage) {
+  if (config.twitterHandle || siteUrl) {
     tags.push({ name: "twitter:card", content: "summary_large_image" });
 
     if (fullTitle) {
@@ -197,6 +200,6 @@ export function getPageMeta(): (MetaTag | LinkTag)[] {
 
   const hrefLangLinks = generateHrefLangLinks("");
   tags.push(...hrefLangLinks);
-
+  console.log("tags", tags);
   return tags;
 }
