@@ -91,6 +91,11 @@ async function main() {
     await copyIndexToPath(indexPath, targetPath);
   }
 
+  // Step 5: Create 404.html for GitHub Pages fallback routing
+  console.log("\nCreating 404.html for GitHub Pages fallback...");
+  const fallbackPath = path.join(buildDir, "404.html");
+  await copyIndexToPath(indexPath, fallbackPath);
+
   console.log("\nBuild completed successfully!");
 }
 
