@@ -200,6 +200,5 @@ export function getPageMeta(): (MetaTag | LinkTag)[] {
 
   const hrefLangLinks = generateHrefLangLinks("");
   tags.push(...hrefLangLinks);
-  console.log("tags", tags);
   return tags;
 }
