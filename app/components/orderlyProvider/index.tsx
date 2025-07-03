@@ -76,12 +76,29 @@ const LocaleProviderWithLanguages = lazy(async () => {
 		.filter((code: string) => code.length > 0)
 		.map(async (code: string) => {
 			try {
-				const response = await fetch(`${import.meta.env.VITE_BASE_URL ?? ''}/locales/${code}.json`);
-				if (!response.ok) {
-					throw new Error(`Failed to fetch ${code}.json: ${response.status}`);
+				const [baseResponse, extendedResponse] = await Promise.all([
+					fetch(`${import.meta.env.VITE_BASE_URL ?? ''}/locales/${code}.json`),
+					fetch(`${import.meta.env.VITE_BASE_URL ?? ''}/locales/extend/${code}.json`).catch(() => null)
+				]);
+
+				if (!baseResponse.ok) {
+					throw new Error(`Failed to fetch ${code}.json: ${baseResponse.status}`);
 				}
-				const data = await response.json();
-				return { code, data };
+				
+				const baseData = await baseResponse.json();
+				
+				let extendedData = {};
+				if (extendedResponse && extendedResponse.ok) {
+					try {
+						extendedData = await extendedResponse.json();
+					} catch (extendError) {
+						console.warn(`Failed to parse extended locale file for ${code}`);
+					}
+				}
+
+				const mergedData = { ...baseData, ...extendedData };
+				
+				return { code, data: mergedData };
 			} catch (error) {
 				console.error(`Failed to load language: ${code}`, error);
 				return null;
