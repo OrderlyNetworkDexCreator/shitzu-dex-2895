@@ -22,7 +22,7 @@ import walletConnectOnboard from "@web3-onboard/walletconnect";
 import binanceWallet from "@binance/w3w-blocknative-connector";
 
 export const getEvmConnectors = (): CreateConnectorFn[] => {
-  const walletConnectProjectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID;
+  const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
   const isBrowser = typeof window !== "undefined";
 
   const connectors: CreateConnectorFn[] = [injected()];
@@ -42,6 +42,7 @@ export const getEvmConnectors = (): CreateConnectorFn[] => {
       })
     );
   }
+  console.log("-- connectors", connectors);
 
   return connectors;
 };
@@ -85,7 +86,7 @@ export const getSolanaConfig = (networkId: NetworkId) => {
 };
 
 export const getOnboardEvmWallets = () => {
-  const walletConnectProjectId = import.meta.env.VITE_WALLET_CONNECT_PROJECT_ID;
+  const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID;
   const isBrowser = typeof window !== "undefined";
 
   if (!walletConnectProjectId || !isBrowser) {
