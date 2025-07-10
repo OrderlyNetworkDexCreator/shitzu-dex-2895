@@ -42,7 +42,6 @@ export const getEvmConnectors = (): CreateConnectorFn[] => {
       })
     );
   }
-  console.log("-- connectors", connectors);
 
   return connectors;
 };
