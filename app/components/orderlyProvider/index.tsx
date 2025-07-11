@@ -2,7 +2,8 @@ import { ReactNode, useCallback, lazy, Suspense, useState, useEffect } from "rea
 import { OrderlyAppProvider } from "@orderly.network/react-app";
 import { useOrderlyConfig } from "@/utils/config";
 import type { NetworkId } from "@orderly.network/types";
-import { LocaleProvider, Resources, defaultLanguages } from "@orderly.network/i18n";
+import { LocaleProvider, LocaleCode, LocaleEnum, defaultLanguages } from "@orderly.network/i18n";
+import { withBasePath } from "@/utils/base-path";
 import { getSEOConfig, getUserLanguage } from "@/utils/seo";
 
 const NETWORK_ID_KEY = "orderly_network_id";
@@ -30,109 +31,37 @@ const setNetworkId = (networkId: NetworkId) => {
 	}
 };
 
-const removeLangParamFromUrl = () => {
-	if (typeof window !== 'undefined') {
-		const url = new URL(window.location.href);
-		if (url.searchParams.has('lang')) {
-			url.searchParams.delete('lang');
-			window.history.replaceState({}, '', url.toString());
-		}
-	}
+const getAvailableLanguages = (): string[] => {
+	const languages = import.meta.env.VITE_AVAILABLE_LANGUAGES?.split(',')
+		.map((code: string) => code.trim())
+		.filter((code: string) => code.length > 0) || [];
+	
+	return languages.length > 0 ? languages : ['en'];
 };
 
-const getDefaultLanguage = (): string => {
+const getDefaultLanguage = (): LocaleCode => {
 	const seoConfig = getSEOConfig();
 	const userLanguage = getUserLanguage();
-	const availableLanguages = import.meta.env.VITE_AVAILABLE_LANGUAGES?.split(',').map((code: string) => code.trim()) || ['en'];
+	const availableLanguages = getAvailableLanguages();
 	
 	if (typeof window !== 'undefined') {
 		const urlParams = new URLSearchParams(window.location.search);
 		const langParam = urlParams.get('lang');
 		if (langParam && availableLanguages.includes(langParam)) {
-			setTimeout(removeLangParamFromUrl, 0);
-			return langParam;
+			return langParam as LocaleCode;
 		}
 	}
 	
 	if (seoConfig.language && availableLanguages.includes(seoConfig.language)) {
-		return seoConfig.language;
+		return seoConfig.language as LocaleCode;
 	}
 	
 	if (availableLanguages.includes(userLanguage)) {
-		return userLanguage;
+		return userLanguage as LocaleCode;
 	}
 	
-	return availableLanguages[0] || 'en';
+	return (availableLanguages[0] || 'en') as LocaleCode;
 };
-
-const PrivyConnector = lazy(() => import("@/components/orderlyProvider/privyConnector"));
-const WalletConnector = lazy(() => import("@/components/orderlyProvider/walletConnector"));
-
-const LocaleProviderWithLanguages = lazy(async () => {
-	const languageCodes = import.meta.env.VITE_AVAILABLE_LANGUAGES?.split(',') || ['en'];
-	
-	const languagePromises = languageCodes
-		.map((code: string) => code.trim())
-		.filter((code: string) => code.length > 0)
-		.map(async (code: string) => {
-			try {
-				const [baseResponse, extendedResponse] = await Promise.all([
-					fetch(`${import.meta.env.VITE_BASE_URL ?? ''}/locales/${code}.json`),
-					fetch(`${import.meta.env.VITE_BASE_URL ?? ''}/locales/extend/${code}.json`).catch(() => null)
-				]);
-
-				if (!baseResponse.ok) {
-					throw new Error(`Failed to fetch ${code}.json: ${baseResponse.status}`);
-				}
-				
-				const baseData = await baseResponse.json();
-				
-				let extendedData = {};
-				if (extendedResponse && extendedResponse.ok) {
-					try {
-						extendedData = await extendedResponse.json();
-					} catch (extendError) {
-						console.warn(`Failed to parse extended locale file for ${code}`);
-					}
-				}
-
-				const mergedData = { ...baseData, ...extendedData };
-				
-				return { code, data: mergedData };
-			} catch (error) {
-				console.error(`Failed to load language: ${code}`, error);
-				return null;
-			}
-		});
-	
-	const results = await Promise.all(languagePromises);
-	
-	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const resources: Resources<any> = {};
-	results.forEach(result => {
-		if (result) {
-			resources[result.code] = result.data;
-		}
-	});
-	
-	const languages = defaultLanguages.filter(lang => 
-		languageCodes.some((code: string) => code.trim() === lang.localCode)
-	);
-
-	const defaultLanguage = getDefaultLanguage();
-
-	return {
-		default: ({ children }: { children: ReactNode }) => (
-			<LocaleProvider
-				resources={resources}
-				languages={languages}
-				locale={defaultLanguage}
-			>
-				{children}
-			</LocaleProvider>
-		)
-	};
-});
 
 const LoadingSpinner = () => (
 	<div className="loading-container">
@@ -168,6 +97,9 @@ const LoadingSpinner = () => (
 	</div>
 );
 
+const PrivyConnector = lazy(() => import("@/components/orderlyProvider/privyConnector"));
+const WalletConnector = lazy(() => import("@/components/orderlyProvider/walletConnector"));
+
 const OrderlyProvider = (props: { children: ReactNode }) => {
 	const config = useOrderlyConfig();
 	const networkId = getNetworkId();
@@ -185,6 +117,13 @@ const OrderlyProvider = (props: { children: ReactNode }) => {
 			.filter(chain => !isNaN(chain.id));
 	};
 
+	const parseDefaultChain = (envVar: string | undefined): { mainnet: { id: number } } | undefined => {
+		if (!envVar) return undefined;
+		
+		const chainId = parseInt(envVar.trim(), 10);
+		return !isNaN(chainId) ? { mainnet: { id: chainId } } : undefined;
+	};
+
 	const disableMainnet = import.meta.env.VITE_DISABLE_MAINNET === 'true';
 	const mainnetChains = disableMainnet ? [] : parseChainIds(import.meta.env.VITE_ORDERLY_MAINNET_CHAINS);
 	const disableTestnet = import.meta.env.VITE_DISABLE_TESTNET === 'true';
@@ -194,6 +133,8 @@ const OrderlyProvider = (props: { children: ReactNode }) => {
 		...(mainnetChains && { mainnet: mainnetChains }),
 		...(testnetChains && { testnet: testnetChains })
 	} : undefined;
+
+	const defaultChain = parseDefaultChain(import.meta.env.VITE_DEFAULT_CHAIN);
 
 	useEffect(() => {
 		setIsClient(true);
@@ -214,6 +155,41 @@ const OrderlyProvider = (props: { children: ReactNode }) => {
 		[]
 	);
 
+	const onLanguageChanged = async (lang: LocaleCode) => {
+		if (typeof window !== 'undefined') {
+			const url = new URL(window.location.href);
+			if (lang === LocaleEnum.en) {
+				url.searchParams.delete('lang');
+			} else {
+				url.searchParams.set('lang', lang);
+			}
+			window.history.replaceState({}, '', url.toString());
+		}
+	};
+
+	const loadPath = (lang: LocaleCode) => {
+		const availableLanguages = getAvailableLanguages();
+		
+		if (!availableLanguages.includes(lang)) {
+			return [];
+		}
+		
+		if (lang === LocaleEnum.en) {
+			return withBasePath(`/locales/extend/${lang}.json`);
+		}
+		return [
+			withBasePath(`/locales/${lang}.json`),
+			withBasePath(`/locales/extend/${lang}.json`)
+		];
+	};
+
+	const defaultLanguage = getDefaultLanguage();
+	
+	const availableLanguages = getAvailableLanguages();
+	const filteredLanguages = defaultLanguages.filter(lang => 
+		availableLanguages.includes(lang.localCode)
+	);
+
 	const appProvider = (
 		<OrderlyAppProvider
 			brokerId={import.meta.env.VITE_ORDERLY_BROKER_ID}
@@ -223,6 +199,7 @@ const OrderlyProvider = (props: { children: ReactNode }) => {
 			appIcons={config.orderlyAppProvider.appIcons}
 			// eslint-disable-next-line @typescript-eslint/no-explicit-any
 			{...(chainFilter && { chainFilter } as any)}
+			defaultChain={defaultChain}
 		>
 			{props.children}
 		</OrderlyAppProvider>
@@ -237,11 +214,16 @@ const OrderlyProvider = (props: { children: ReactNode }) => {
 		: <WalletConnector networkId={networkId}>{appProvider}</WalletConnector>;
 
 	return (
-		<Suspense fallback={<LoadingSpinner />}>
-			<LocaleProviderWithLanguages>
+		<LocaleProvider
+			onLanguageChanged={onLanguageChanged}
+			backend={{ loadPath }}
+			locale={defaultLanguage}
+			languages={filteredLanguages}
+		>
+			<Suspense fallback={<LoadingSpinner />}>
 				{walletConnector}
-			</LocaleProviderWithLanguages>
-		</Suspense>
+			</Suspense>
+		</LocaleProvider>
 	);
 };
 
