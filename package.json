@@ -16,19 +16,19 @@
     "typecheck": "tsc"
   },
   "dependencies": {
-    "@orderly.network/affiliate": "2.4.1",
-    "@orderly.network/i18n": "2.4.1",
-    "@orderly.network/markets": "2.4.1",
-    "@orderly.network/portfolio": "2.4.1",
-    "@orderly.network/react-app": "2.4.1",
-    "@orderly.network/trading": "2.4.1",
-    "@orderly.network/trading-leaderboard": "2.4.1",
-    "@orderly.network/trading-rewards": "^2.4.1",
-    "@orderly.network/types": "2.4.1",
-    "@orderly.network/ui": "2.4.1",
-    "@orderly.network/ui-scaffold": "2.4.1",
-    "@orderly.network/wallet-connector": "2.4.1",
-    "@orderly.network/wallet-connector-privy": "2.4.1",
+    "@orderly.network/affiliate": "2.5.2",
+    "@orderly.network/i18n": "2.5.2",
+    "@orderly.network/markets": "2.5.2",
+    "@orderly.network/portfolio": "2.5.2",
+    "@orderly.network/react-app": "2.5.2",
+    "@orderly.network/trading": "2.5.2",
+    "@orderly.network/trading-leaderboard": "2.5.2",
+    "@orderly.network/trading-rewards": "^2.5.2",
+    "@orderly.network/types": "2.5.2",
+    "@orderly.network/ui": "2.5.2",
+    "@orderly.network/ui-scaffold": "2.5.2",
+    "@orderly.network/wallet-connector": "2.5.2",
+    "@orderly.network/wallet-connector-privy": "2.5.2",
     "@privy-io/cross-app-connect": "^0.2.1",
     "@remix-run/node": "^2.15.3",
     "@remix-run/react": "^2.15.3",
@@ -65,5 +65,8 @@
     "vite-plugin-cjs-interop": "^2.2.0",
     "vite-plugin-node-polyfills": "0.23.0",
     "vite-tsconfig-paths": "^5.1.4"
+  },
+  "resolutions": {
+    "**/*/@reown/appkit": "1.7.8"
   }
 }
