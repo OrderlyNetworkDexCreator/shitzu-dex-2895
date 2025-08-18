@@ -11,7 +11,7 @@ export default function AffiliatePage() {
       <ReferralProvider
         becomeAnAffiliateUrl="https://orderly.network"
         learnAffiliateUrl="https://orderly.network"
-        referralLinkUrl="https://orderly.network"
+        referralLinkUrl={typeof window !== 'undefined' ? window.location.origin : "https://orderly.network"}
       >
         <Dashboard.AffiliatePage />
       </ReferralProvider>
